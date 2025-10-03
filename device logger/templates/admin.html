@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Edit Inventory</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Edit Inventory</h1>
+        <form method="post">
+            <div class="panel">
+                {% for name, count in items %}
+                <div class="item">
+                    <label class="item-name" for="{{ name }}">{{ name }}</label>
+                    <input class="item-input" type="number" name="{{ name }}" id="{{ name }}" value="{{ count }}" min="0">
+                </div>
+                {% endfor %}
+            </div>
+            <button class="refresh-btn" type="submit">Save</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Logger - IT Inventory</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>IT Department Inventory</h1>
+        <div>
+            {% for name, count in items %}
+            <div class="device-row">
+                <span class="device-label" style="font-size:1.35em;font-weight:600;letter-spacing:0.5px;">{{ name }}</span>
+                <span class="counter-value" style="font-size:1.35em;font-weight:500;">{{ count }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        <form action="/refresh" method="get" style="margin-top:48px;">
+            <button class="refresh-btn large-btn" type="submit">Refresh</button>
+        </form>
+    </div>
+</body>
+</html>
