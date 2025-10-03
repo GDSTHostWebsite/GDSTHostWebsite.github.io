@@ -10,15 +10,13 @@
     <div class="container">
         <h1>Edit Inventory</h1>
         <form method="post">
-            <div class="panel">
-                {% for name, count in items %}
-                <div class="item">
-                    <label class="item-name" for="{{ name }}">{{ name }}</label>
-                    <input class="item-input" type="number" name="{{ name }}" id="{{ name }}" value="{{ count }}" min="0">
-                </div>
-                {% endfor %}
+            {% for name, count in items %}
+            <div class="device-row">
+                <label class="device-label" for="{{ name }}">{{ name }}</label>
+                <input class="counter-value" type="number" name="{{ name }}" id="{{ name }}" value="{{ count }}" min="0">
             </div>
-            <button class="refresh-btn" type="submit">Save</button>
+            {% endfor %}
+            <button class="refresh-btn large-btn" type="submit">Save</button>
         </form>
     </div>
 </body>

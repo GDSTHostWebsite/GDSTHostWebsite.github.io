@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 import sqlite3
 import os
-
+import hashlib
 app = Flask(__name__)
 DATABASE = os.path.join(os.path.dirname(__file__), 'inventory.db')
 
@@ -14,23 +14,30 @@ def init_db():
         name TEXT UNIQUE,
         count INTEGER
     )''')
+    c.execute('''CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY,
+        username TEXT UNIQUE,
+        password_hash TEXT
+    )''')
     # Insert default items if not present
-        import hashlib
-        c.execute('''CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY,
-            username TEXT UNIQUE,
-            password_hash TEXT
-        )''')
-        # Insert default items if not present
-        for item in ['Laptops', 'Laptop Chargers', 'Headphones']:
-            c.execute('INSERT OR IGNORE INTO items (name, count) VALUES (?, ?)', (item, 0))
-        # Insert default admin user if not present
-        admin_username = 'admin'
-        admin_password = 'admin123'  # Change this after first login
+    for item in ['Laptops', 'Laptop Chargers', 'Headphones']:
+        c.execute('INSERT OR IGNORE INTO items (name, count) VALUES (?, ?)', (item, 0))
+    # Insert admin user if not present
+    c.execute('SELECT COUNT(*) FROM users')
+    user_count = c.fetchone()[0]
+    if user_count == 0:
+        print("No admin user found. Please set up your admin credentials.")
+        admin_username = input("Enter admin username: ").strip()
+        while not admin_username:
+            admin_username = input("Username cannot be empty. Enter admin username: ").strip()
+        import getpass
+        admin_password = getpass.getpass("Enter admin password: ").strip()
+        while not admin_password:
+            admin_password = getpass.getpass("Password cannot be empty. Enter admin password: ").strip()
         password_hash = hashlib.sha256(admin_password.encode()).hexdigest()
-        c.execute('INSERT OR IGNORE INTO users (username, password_hash) VALUES (?, ?)', (admin_username, password_hash))
-        conn.commit()
-        conn.close()
+        c.execute('INSERT INTO users (username, password_hash) VALUES (?, ?)', (admin_username, password_hash))
+    conn.commit()
+    conn.close()
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 app.secret_key = 'supersecretkey'  # Change this in production
 
@@ -62,7 +69,6 @@ def index():
 def refresh():
     return redirect(url_for('index'))
 
-@app.route('/admin', methods=['GET', 'POST'])
 def check_login():
     return session.get('logged_in', False)
 
@@ -76,7 +82,7 @@ def admin():
             new_count = request.form.get(name)
             if new_count is not None and new_count.isdigit():
                 update_item(name, int(new_count))
-        return redirect(url_for('admin'))
+        return redirect(url_for('index'))
     return render_template('admin.html', items=items)
 
 @app.route('/login', methods=['GET', 'POST'])
